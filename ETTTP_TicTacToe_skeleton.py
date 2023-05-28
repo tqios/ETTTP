@@ -35,13 +35,14 @@ class TTT(tk.Tk):
         
         
         # Set variables for Client and Server UI
+        ############## updated ###########################
         if client:
             self.myID = 1   #0: server, 1: client
             self.title('34743-02-Tic-Tac-Toe Client')
             self.user = {'value': self.line_size+1, 'bg': 'blue',
-                     'win': 'Result: You Won!', 'text':'O','Name':"YOU"}
+                     'win': 'Result: You Won!', 'text':'O','Name':"ME"}
             self.computer = {'value': 1, 'bg': 'orange',
-                             'win': 'Result: You Lost!', 'text':'X','Name':"ME"}   
+                             'win': 'Result: You Lost!', 'text':'X','Name':"YOU"}   
         else:
             self.myID = 0
             self.title('34743-02-Tic-Tac-Toe Server')
@@ -49,6 +50,8 @@ class TTT(tk.Tk):
                          'win': 'Result: You Won!', 'text':'X','Name':"ME"}   
             self.computer = {'value': self.line_size+1, 'bg': 'blue',
                      'win': 'Result: You Lost!', 'text':'O','Name':"YOU"}
+        ##################################################
+
             
         self.board_bg = 'white'
         self.all_lines = ((0, 1, 2), (3, 4, 5), (6, 7, 8),
@@ -252,13 +255,16 @@ class TTT(tk.Tk):
         self.t_debug.delete(1.0,"end")
         
         ###################  Fill Out  #######################
-        
+        '''
+        Check if the selected location is already taken or not
+        '''
+
         '''
         Send message to peer
         '''
         
         '''
-        Get ack, extract move from the input
+        Get ack
         '''
         
         loc = 5 # peer's move, from 0 to 8
