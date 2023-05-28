@@ -30,15 +30,17 @@ if __name__ == '__main__':
     while True:
         client_socket, client_addr = server_socket.accept()
         
-        start = random.randrange(0,2)   # select random to start
-        
+        start = str(random.randrange(0,2)).encode()   # select random to start
+
         ###################################################################
         # Send start move information to peer
+        client_socket.send(start)
     
     
         ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
-        
+        data = client_socket.recv(SIZE).decode()
+        print(data)
         
         ###################################################################
         

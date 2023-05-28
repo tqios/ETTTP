@@ -32,10 +32,15 @@ if __name__ == '__main__':
         
         ###################################################################
         # Receive who will start first from the server
-    
+        print("success")
+        data = client_socket.recv(SIZE)
+        start = int(data.decode())
+
+
     
         ######################### Fill Out ################################
-        # Send ACK 
+        # Send ACK
+        # data = client_socket.send()
         
         
         ###################################################################

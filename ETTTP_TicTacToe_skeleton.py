@@ -141,7 +141,7 @@ class TTT(tk.Tk):
             
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    def play(self, start_user=1):
+    def play(self, start_user):
         '''
         Call this function to initiate the game
         
