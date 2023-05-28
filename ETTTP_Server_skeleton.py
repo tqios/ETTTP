@@ -34,12 +34,25 @@ if __name__ == '__main__':
         
         ###################################################################
         # Send start move information to peer
-    
-    
-        ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
-        
-        
+        if start == 0:
+            client_socket.send(bytes("It's the server's turn", "utf-8"))
+            print("It's the server's turn")
+            if client_socket.recv(SIZE).decode() != "ACK : It's the server's turn":
+                print("INVALID ACK")
+                break
+
+        elif start == 1:
+            client_socket.send(bytes("It's the client's turn", "utf-8"))
+            print("It's the client's turn")
+            if client_socket.recv(SIZE).decode() != "ACK : It's the client's turn" :
+                print("INVALID ACK")
+                break
+
+        else:
+            print("INVALID VALUE")
+            break
+
         ###################################################################
         
         root = TTT(client=False,target_socket=client_socket, src_addr=MY_IP,dst_addr=client_addr[0])

@@ -32,12 +32,15 @@ if __name__ == '__main__':
         
         ###################################################################
         # Receive who will start first from the server
-    
-    
-        ######################### Fill Out ################################
-        # Send ACK 
-        
-        
+        if client_socket.recv(SIZE).decode() == "It's the server's turn":
+            start = 0
+            client_socket.send(bytes("ACK : It's the server's turn", "utf-8"))
+        elif client_socket.recv(SIZE).decode() == "It's the client's turn":
+            start = 1
+            client_socket.send(bytes("ACK : It's the client's turn", "utf-8"))
+        else:
+            print("INVALID RECV")
+
         ###################################################################
         
         # Start game
