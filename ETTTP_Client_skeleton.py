@@ -31,12 +31,17 @@ if __name__ == '__main__':
         client_socket.connect(SERVER_ADDR)  
         
         ###################################################################
-        # Receive who will start first from the server
-        print("success")
-        data = client_socket.recv(SIZE)
-        start = int(data.decode())
-        print(start);
 
+        recv = client_socket.recv(SIZE).decode()
+
+        if check_msg(recv):
+            client_socket.send(bytes(recv, "utf-8"))
+            recv_msg = recv.split("\r\n")[2]
+            print("recv_msg : ", recv_msg)
+            if recv_msg.endswith("server"):
+                start = 0
+            else:
+                start = 1
 
 
         ######################### Fill Out ################################

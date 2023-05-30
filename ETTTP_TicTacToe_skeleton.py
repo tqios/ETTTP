@@ -216,8 +216,13 @@ class TTT(tk.Tk):
         '''
         ###################  Fill Out  #######################
         # msg =  "message" # get message using socket
-        msg = self.socket.recv(SIZE).decode()
-        print(msg)
+        # msg = self.socket.recv(SIZE).decode()
+        # print(msg)
+
+        send = self.socket.recv(SIZE).decode()
+        send_msg = send.split("\r\n")[2]
+        print("send_msg : ", send_msg)
+        loc = int(send_msg[-1])
 
 
         # todo 만약 msg가 valid하면 ture, 아니면 false
@@ -232,7 +237,6 @@ class TTT(tk.Tk):
             # todo ack보내기
             # loc = 5 # received next-move
 
-            loc = int(msg)
 
             ######################################################
 
@@ -300,8 +304,10 @@ class TTT(tk.Tk):
         # todo send message and check ACK
         print(selection)
         print(row,col)
-        msg = str(selection).encode()
-        self.socket.send(msg)
+        #row, col 값 메시지에 넣어서 보내기
+        send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:"+str(selection)+"\r\n\r\n"
+        #msg = str(selection).encode()
+        self.socket.send(send_msg.encode())
 
 
         return True
@@ -365,14 +371,20 @@ class TTT(tk.Tk):
 
 # End of Root class
 
-def check_msg(msg, recv_ip):
+# def check_msg(msg, recv_ip):
+def check_msg(msg):
     '''
     Function that checks if received message is ETTTP format
     '''
     ###################  Fill Out  #######################
-
-
-
-
-    return True
+    msg_first = msg.startswith("ETTTP/1.0\r\nHost:127.0.0.1\r\n")
+    print("first : ", msg_first)
+    msg_end = msg.endswith("\r\n\r\n")
+    print("end : ", msg_end)
+    if msg_first & msg_end :
+        print("check_msg = true")
+        return True
+    else :
+        print("check_msg = false")
+        return False
     ######################################################
