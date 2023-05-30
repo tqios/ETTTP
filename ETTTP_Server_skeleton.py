@@ -30,33 +30,23 @@ if __name__ == '__main__':
     while True:
         client_socket, client_addr = server_socket.accept()
         
-        start = random.randrange(0,2)   # select random to start
-        
+        start = str(random.randrange(0,2)).encode()   # select random to start
+
         ###################################################################
         # Send start move information to peer
+        client_socket.send(start)
+
+
+        ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
-        if start == 0:
-            client_socket.send(bytes("It's the server's turn", "utf-8"))
-            print("It's the server's turn")
-            if client_socket.recv(SIZE).decode() != "ACK : It's the server's turn":
-                print("INVALID ACK")
-                break
-
-        elif start == 1:
-            client_socket.send(bytes("It's the client's turn", "utf-8"))
-            print("It's the client's turn")
-            if client_socket.recv(SIZE).decode() != "ACK : It's the client's turn" :
-                print("INVALID ACK")
-                break
-
-        else:
-            print("INVALID VALUE")
-            break
+        # data = client_socket.recv(SIZE).decode()
+        # print(data)
 
         ###################################################################
-        
+
         root = TTT(client=False,target_socket=client_socket, src_addr=MY_IP,dst_addr=client_addr[0])
-        root.play(start_user=start)
+        print()
+        root.play(start_user=int(start))
         root.mainloop()
         
         client_socket.close()
