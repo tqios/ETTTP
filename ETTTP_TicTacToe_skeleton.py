@@ -144,7 +144,7 @@ class TTT(tk.Tk):
     def play(self, start_user):
         '''
         Call this function to initiate the game
-        
+
         start_user: if its 0, start by "server" and if its 1, start by "client"
         '''
         #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
@@ -155,7 +155,7 @@ class TTT(tk.Tk):
         self.create_debug_frame()
         self.state = self.active
         if start_user == self.myID:
-            self.my_turn = 1    
+            self.my_turn = 1
             self.user['text'] = 'X'
             self.computer['text'] = 'O'
             self.l_status_bullet.config(fg='green')
@@ -176,31 +176,31 @@ class TTT(tk.Tk):
         #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
         self.destroy()
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        
-    def my_move(self, e, user_move):    
+
+    def my_move(self, e, user_move):
         '''
         Read button when the player clicks the button
-        
+
         e: event
-        user_move: button number, from 0 to 8 
+        user_move: button number, from 0 to 8
         '''
         #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
-        
+
         # When it is not my turn or the selected location is already taken, do nothing
         if self.board[user_move] != 0 or not self.my_turn:
             return
-        # Send move to peer 
+        # Send move to peer
         valid = self.send_move(user_move)
-        
+
         # If ACK is not returned from the peer or it is not valid, exit game
         if not valid:
             self.quit()
-            
+
         # Update Tic-Tac-Toe board based on user's selection
         self.update_board(self.user, user_move)
-        
+
         # If the game is not over, change turn
-        if self.state == self.active:    
+        if self.state == self.active:
             self.my_turn = 0
             self.l_status_bullet.config(fg='red')
             self.l_status ['text'] = ['Hold']
@@ -215,30 +215,36 @@ class TTT(tk.Tk):
         If is not, close socket and quit
         '''
         ###################  Fill Out  #######################
-        msg =  "message" # get message using socket
+        # msg =  "message" # get message using socket
+        msg = self.socket.recv(SIZE).decode()
+        print(msg)
 
-        msg_valid_check = False
-         
-        
-        if msg_valid_check: # Message is not valid
-            self.socket.close()   
+
+        # todo 만약 msg가 valid하면 ture, 아니면 false
+        msg_valid_check = True
+
+
+        if not msg_valid_check: # Message is not valid
+            self.socket.close()
             self.quit()
             return
         else:  # If message is valid - send ack, update board and change turn
+            # todo ack보내기
+            # loc = 5 # received next-move
 
-            loc = 5 # received next-move
-            
-            ######################################################   
-            
-            
+            loc = int(msg)
+
+            ######################################################
+
+
             #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
             self.update_board(self.computer, loc, get=True)
-            if self.state == self.active:  
+            if self.state == self.active:
                 self.my_turn = 1
                 self.l_status_bullet.config(fg='green')
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                
+
 
     def send_debug(self):
         '''
@@ -253,7 +259,7 @@ class TTT(tk.Tk):
         d_msg = self.t_debug.get(1.0,"end")
         d_msg = d_msg.replace("\\r\\n","\r\n")   # msg is sanitized as \r\n is modified when it is given as input
         self.t_debug.delete(1.0,"end")
-        
+
         ###################  Fill Out  #######################
         '''
         Check if the selected location is already taken or not
@@ -262,27 +268,27 @@ class TTT(tk.Tk):
         '''
         Send message to peer
         '''
-        
+
         '''
         Get ack
         '''
-        
-        loc = 5 # peer's move, from 0 to 8
 
-        ######################################################  
-        
+        # loc = 5 # peer's move, from 0 to 8
+
+        ######################################################
+
         #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
         self.update_board(self.user, loc)
-            
+
         if self.state == self.active:    # always after my move
             self.my_turn = 0
             self.l_status_bullet.config(fg='red')
             self.l_status ['text'] = ['Hold']
             _thread.start_new_thread(self.get_move,())
-            
+
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        
-        
+
+
     def send_move(self,selection):
         '''
         Function to send message to peer using button click
@@ -291,12 +297,17 @@ class TTT(tk.Tk):
         row,col = divmod(selection,3)
         ###################  Fill Out  #######################
 
-        # send message and check ACK
-        
-        return True
-        ######################################################  
+        # todo send message and check ACK
+        print(selection)
+        print(row,col)
+        msg = str(selection).encode()
+        self.socket.send(msg)
 
-    
+
+        return True
+        ######################################################
+
+
     def check_result(self,winner,get=False):
         '''
         Function to check if the result between peers are same
@@ -305,18 +316,18 @@ class TTT(tk.Tk):
         # no skeleton
         ###################  Fill Out  #######################
 
-        
+
 
 
         return True
-        ######################################################  
+        ######################################################
 
-        
+
     #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
     def update_board(self, player, move, get=False):
         '''
         This function updates Board if is clicked
-        
+
         '''
         self.board[move] = player['value']
         self.remaining_moves.remove(move)
@@ -360,8 +371,8 @@ def check_msg(msg, recv_ip):
     '''
     ###################  Fill Out  #######################
 
-    
+
 
 
     return True
-    ######################################################  
+    ######################################################

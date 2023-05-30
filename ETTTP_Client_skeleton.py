@@ -35,16 +35,17 @@ if __name__ == '__main__':
         print("success")
         data = client_socket.recv(SIZE)
         start = int(data.decode())
+        print(start);
 
 
-    
+
         ######################### Fill Out ################################
         # Send ACK
         # data = client_socket.send()
-        
-        
+
+
         ###################################################################
-        
+
         # Start game
         root = TTT(target_socket=client_socket, src_addr=MY_IP,dst_addr=SERVER_IP)
         root.play(start_user=start)

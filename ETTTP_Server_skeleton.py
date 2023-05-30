@@ -35,17 +35,18 @@ if __name__ == '__main__':
         ###################################################################
         # Send start move information to peer
         client_socket.send(start)
-    
-    
+
+
         ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
-        data = client_socket.recv(SIZE).decode()
-        print(data)
-        
+        # data = client_socket.recv(SIZE).decode()
+        # print(data)
+
         ###################################################################
-        
+
         root = TTT(client=False,target_socket=client_socket, src_addr=MY_IP,dst_addr=client_addr[0])
-        root.play(start_user=start)
+        print()
+        root.play(start_user=int(start))
         root.mainloop()
         
         client_socket.close()
