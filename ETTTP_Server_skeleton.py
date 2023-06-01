@@ -40,21 +40,23 @@ if __name__ == '__main__':
         start = random.randrange(0,2)
         print("start : ", start)
         if start == 0:
-            send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: server\r\n\r\n"
-            client_socket.send(bytes(send_msg, "utf-8"))
-            ack = client_socket.recv(SIZE).decode()
-            if check_msg(ack):
-                ack_msg = ack.split("\r\n")[2]
-                print("ack_msg : ", ack_msg)
+            send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: server\r\n\r\n"
+            client_socket.send(send_msg.encode()) #msg보내고
+            msg = client_socket.recv(SIZE).decode() #ack받고
+            # print('에크메시지',msg)
+            if check_msg(msg): #ack가 ETTTP인지 확인
+                ack_msg = msg.split("\r\n")[2]
+                # print("ack_msg : ", ack_msg)
 
 
         else:
-            send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: client\r\n\r\n"
-            client_socket.send(bytes(send_msg, "utf-8"))
-            ack = client_socket.recv(SIZE).decode()
-            if check_msg(ack):
-                ack_msg = ack.split("\r\n")[2]
-                print("ack_msg : ", ack_msg)
+            send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: client\r\n\r\n"
+            client_socket.send(send_msg.encode())
+            msg = client_socket.recv(SIZE).decode()
+            print(msg)
+            if check_msg(msg):
+                ack_msg = msg.split("\r\n")[2]
+                # print("ack_msg : ", ack_msg)
 
         ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
