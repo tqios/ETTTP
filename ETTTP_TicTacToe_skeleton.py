@@ -219,14 +219,33 @@ class TTT(tk.Tk):
         # msg = self.socket.recv(SIZE).decode()
         # print(msg)
 
-        send = self.socket.recv(SIZE).decode()
-        send_msg = send.split("\r\n")[2]
-        print("send_msg : ", send_msg)
-        loc = int(send_msg[-1])
+        msg = self.socket.recv(SIZE).decode()
+
+        ###################################여기 새로짯음 6월 1일ㅇㅇㅇㅇ
+        raw_loc = msg.split("\r\n")
+        data = msg.split("\r\n")
+
+        result = {}
+        for item in data:
+            if ':' in item:
+                key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
+                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+
+        print(result)
+
+        print("raw_loc : ", raw_loc)
+        row = int(raw_loc[-4])
+        col = int(raw_loc[-2])
+        loc = row*3+col
+        print("row : ",row)
 
 
-        # todo 만약 msg가 valid하면 ture, 아니면 false
-        msg_valid_check = True
+        # todo 만약 msg가 valid하면 ture, 아니면 false -> 했음
+        if check_msg(msg):
+            msg_valid_check = True
+        else:
+            msg_valid_check = False
+
 
 
         if not msg_valid_check: # Message is not valid
@@ -236,6 +255,8 @@ class TTT(tk.Tk):
         else:  # If message is valid - send ack, update board and change turn
             # todo ack보내기
             # loc = 5 # received next-move
+            ack = "ACK ETTTP/1.0\r\nHost:192.168.0.2\r\nFirst-Move: ME\r\n\r\n"
+            self.socket.send(ack.encode());
 
 
             ######################################################
@@ -268,6 +289,8 @@ class TTT(tk.Tk):
         '''
         Check if the selected location is already taken or not
         '''
+        print("디버그 ",self.user['value'])
+
 
         '''
         Send message to peer
@@ -303,9 +326,11 @@ class TTT(tk.Tk):
 
         # todo send message and check ACK
         print(selection)
-        print(row,col)
+        print(divmod(selection,3))
         #row, col 값 메시지에 넣어서 보내기
-        send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:"+str(selection)+"\r\n\r\n"
+        send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
+        # send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
+        print(send_msg)
         #msg = str(selection).encode()
         self.socket.send(send_msg.encode())
 
