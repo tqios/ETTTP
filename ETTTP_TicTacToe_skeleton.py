@@ -222,25 +222,12 @@ class TTT(tk.Tk):
         msg = self.socket.recv(SIZE).decode()
 
         ###################################여기 새로짯음 6월 1일ㅇㅇㅇㅇ
-        print('send메시지받은거 : ',msg)
-        raw_loc = msg.split("\r\n")
         data = msg.split("\r\n")
-        # loc = 0
         result = {}
         for item in data:
             if ':' in item:
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
                 result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
-
-        print(result)
-        print('New-Move' in result)
-        # if 'SEND' in msg :
-        #     print("raw_loc : ", raw_loc)
-        #     row = int(result['New-Move'][1])
-        #     col = int(result['New-Move'][3])
-        #     loc = row * 3 + col
-        #     print("row : ", row)
-
 
 
         # todo 만약 msg가 valid하면 ture, 아니면 false -> 했음
@@ -248,8 +235,6 @@ class TTT(tk.Tk):
             msg_valid_check = True
         else:
             msg_valid_check = False
-
-
 
         if not msg_valid_check: # Message is not valid
             self.socket.close()
@@ -261,8 +246,8 @@ class TTT(tk.Tk):
             row = int(result['New-Move'][1])
             col = int(result['New-Move'][3])
             loc = row * 3 + col
-            # ack = "ACK ETTTP/1.0\r\nHost:192.168.0.2\r\nFirst-Move: ME\r\n\r\n"
-            # self.socket.send(ack.encode());
+            ack = "ACK ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: ME\r\n\r\n"
+            self.socket.send(ack.encode());
 
 
             ######################################################
@@ -335,12 +320,13 @@ class TTT(tk.Tk):
         print(divmod(selection,3))
         #row, col 값 메시지에 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
-        # send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
         print(send_msg)
         #msg = str(selection).encode()
         self.socket.send(send_msg.encode())
 
-
+        ack = self.socket.recv(SIZE).decode()
+        check_msg(ack);
+        print('ack를 받았다', ack)
         return True
         ######################################################
 
@@ -418,20 +404,11 @@ def check_msg(msg):
     print(first_line.split(' ')[1])
     protocol = first_line.split(' ')[1]
 
-    # 프로토콜이 TCP인지 확인합니다.
+    # 프로토콜이 ETTTP인지 확인합니다.
     is_tcp = protocol == "ETTTP/1.0"
     print(is_tcp)
     if is_tcp :
         return True
     else :
         return False
-    # print("first : ", msg_first)
-    # msg_end = msg.endswith("\r\n\r\n")
-    # print("end : ", msg_end)
-    # if msg_first & msg_end :
-    #     print("check_msg = true")
-    #     return True
-    # else :
-    #     print("check_msg = false")
-    #     return False
     ######################################################

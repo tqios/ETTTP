@@ -33,13 +33,10 @@ if __name__ == '__main__':
         ###################################################################
 
         recv = client_socket.recv(SIZE).decode()
-        print(recv)
-        print(check_msg(recv))
 
         if check_msg(recv):
             client_socket.send(recv.encode())
             recv_msg = recv.split("\r\n")[2]
-            print("recv_msg : ", recv_msg)
             if recv_msg.endswith("server"):
                 start = 0
             else:
