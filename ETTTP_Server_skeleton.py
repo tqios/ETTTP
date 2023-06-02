@@ -4,8 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+  Jun 02, 2023
  
  '''
 
@@ -29,42 +28,32 @@ if __name__ == '__main__':
     
     while True:
         client_socket, client_addr = server_socket.accept()
-        
-        # start = str(random.randrange(0,2)).encode()   # select random to start
 
         ###################################################################
         # Send start move information to peer
         # client_socket.send(start)
-
-
-        start = random.randrange(0,2)
-        print("start : ", start)
-        if start == 0:
-            send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: server\r\n\r\n"
-            client_socket.send(bytes(send_msg, "utf-8"))
-            ack = client_socket.recv(SIZE).decode()
-            if check_msg(ack):
-                ack_msg = ack.split("\r\n")[2]
-                print("ack_msg : ", ack_msg)
-
-
-        else:
-            send_msg = "ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: client\r\n\r\n"
-            client_socket.send(bytes(send_msg, "utf-8"))
-            ack = client_socket.recv(SIZE).decode()
-            if check_msg(ack):
-                ack_msg = ack.split("\r\n")[2]
-                print("ack_msg : ", ack_msg)
-
         ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
-        # data = client_socket.recv(SIZE).decode()
-        # print(data)
+
+        start = random.randrange(0,2)
+        if start == 0:
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: server\r\n\r\n"
+            client_socket.send(send_msg.encode()) #msg보내고
+            msg = client_socket.recv(SIZE).decode() #ack받고
+            if check_msg(msg, MY_IP): #ack가 ETTTP인지 확인
+                ack_msg = msg.split("\r\n")[2]
+
+        #TODO : 메시지 보낼 때 server, client 를 ME, YOU 로 바꾸기
+        else:
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: client\r\n\r\n"
+            client_socket.send(send_msg.encode())
+            msg = client_socket.recv(SIZE).decode()
+            if check_msg(msg, MY_IP):
+                ack_msg = msg.split("\r\n")[2]
 
         ###################################################################
 
         root = TTT(client=False,target_socket=client_socket, src_addr=MY_IP,dst_addr=client_addr[0])
-        print()
         root.play(start_user=start)
         root.mainloop()
         
