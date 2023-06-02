@@ -3,8 +3,9 @@
  
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
-
-  Jun 02, 2023
+ 
+  Skeleton Code Prepared by JeiHee Cho
+  May 24, 2023
  
  '''
 
@@ -246,6 +247,8 @@ class TTT(tk.Tk):
         else:
             msg_valid_check = False
 
+
+
         if not msg_valid_check: # Message is not valid
             self.socket.close()
             self.quit()
@@ -266,6 +269,7 @@ class TTT(tk.Tk):
                 self.l_status_bullet.config(fg='green')
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
     def send_debug(self):
         '''
@@ -377,7 +381,6 @@ class TTT(tk.Tk):
         self.setText[move].set(player['text'])
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
-        print("보드**", self.board)
 
     def update_status(self, player,get=False):
         '''
