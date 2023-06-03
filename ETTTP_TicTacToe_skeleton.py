@@ -3,9 +3,8 @@
  
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
- 
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+
+  Jun 02, 2023
  
  '''
 
@@ -216,15 +215,15 @@ class TTT(tk.Tk):
 
     def create_dictionary(self, msg):
         data = msg.split("\r\n")
-        dic = {}
+        result = {}
         if not msg :
             self.quit()
 
         for item in data:
             if ':' in item:
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-                dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
-        return dic
+                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        return result
 
     def get_move(self):
         '''
@@ -239,23 +238,26 @@ class TTT(tk.Tk):
         # print(msg)
 
         msg = self.socket.recv(SIZE).decode()
-        dic = self.create_dictionary(msg)
-
+        result = self.create_dictionary(msg)
+        # data = msg.split("\r\n")
+        #
+        # for item in data:
+        #     if ':' in item:
+        #         key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
+        #         result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
 
         if check_msg(msg, self.recv_ip):
             msg_valid_check = True
         else:
             msg_valid_check = False
 
-
-
         if not msg_valid_check: # Message is not valid
             self.socket.close()
             self.quit()
             return
         else:  # If message is valid - send ack, update board and change turn
-            row = int(dic['New-Move'][1])
-            col = int(dic['New-Move'][3])
+            row = int(result['New-Move'][1])
+            col = int(result['New-Move'][3])
             loc = row * 3 + col
             #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
             ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
@@ -270,7 +272,7 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+    #todo : send_debug 함수 만들기
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -292,9 +294,9 @@ class TTT(tk.Tk):
         # print("디버그 ",self.user)
         # print('d_msg:',d_msg)
         # print("보드?", self.board)
-        dic = self.create_dictionary(d_msg)
-        row = int(dic['New-Move'][1])
-        col = int(dic['New-Move'][3])
+        result = self.create_dictionary(d_msg)
+        row = int(result['New-Move'][1])
+        col = int(result['New-Move'][3])
         loc = row * 3 + col
 
         if self.board[loc] != 0 :
@@ -302,6 +304,10 @@ class TTT(tk.Tk):
             # client_socket.send()
             self.quit()
             return
+
+        # if (self.board[loc] != 0):
+        #     self.quit()
+
 
         '''
         Send message to peer
@@ -317,6 +323,14 @@ class TTT(tk.Tk):
         if not(check_msg(ack, self.recv_ip)) :
             self.quit()
 
+
+
+
+
+
+
+
+        # loc = 5 # peer's move, from 0 to 8
 
         ######################################################
 
@@ -340,6 +354,7 @@ class TTT(tk.Tk):
         row,col = divmod(selection,3)
         ###################  Fill Out  #######################
 
+        # todo send message and check ACK
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
         #msg = str(selection).encode()
@@ -381,6 +396,7 @@ class TTT(tk.Tk):
         self.setText[move].set(player['text'])
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
+        print("보드**", self.board)
 
     def update_status(self, player,get=False):
         '''
