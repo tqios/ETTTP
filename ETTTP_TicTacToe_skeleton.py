@@ -352,6 +352,7 @@ class TTT(tk.Tk):
         '''
         This function checks status - define if the game is over or not
         '''
+
         winner_sum = self.line_size * player['value']
         for line in self.all_lines:
             if sum(self.board[i] for i in line) == winner_sum:

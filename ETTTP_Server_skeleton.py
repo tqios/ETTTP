@@ -41,7 +41,7 @@ if __name__ == '__main__':
             client_socket.send(send_msg.encode()) #msg보내고
             ack = client_socket.recv(SIZE).decode() #ack받고
             ack_msg = ack.split("\r\n")[2]
-            if not check_msg(ack, MY_IP) and ack_msg == "YOU": #ack가 ETTTP이고 ack_msg가 YOU인지 확인
+            if not (check_msg(ack, MY_IP) and ack_msg == "YOU"): #ack가 ETTTP이고 ack_msg가 YOU인지 확인
                 quit();
 
         #TODO : 메시지 보낼 때 server, client 를 ME, YOU 로 바꾸기
@@ -50,7 +50,7 @@ if __name__ == '__main__':
             client_socket.send(send_msg.encode())
             ack = client_socket.recv(SIZE).decode()
             ack_msg = ack.split("\r\n")[2]
-            if not check_msg(ack, MY_IP) and ack_msg == "ME": #ack가 ETTTP이고 ack_msg가 ME인지 확인
+            if not (check_msg(ack, MY_IP) and ack_msg == "ME"): #ack가 ETTTP이고 ack_msg가 ME인지 확인
                 quit();
 
         ###################################################################
