@@ -215,15 +215,15 @@ class TTT(tk.Tk):
 
     def create_dictionary(self, msg):
         data = msg.split("\r\n")
-        result = {}
+        dic = {}
         if not msg :
             self.quit()
 
         for item in data:
             if ':' in item:
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
-        return result
+                dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        return dic
 
     def get_move(self):
         '''
@@ -238,13 +238,8 @@ class TTT(tk.Tk):
         # print(msg)
 
         msg = self.socket.recv(SIZE).decode()
-        result = self.create_dictionary(msg)
-        # data = msg.split("\r\n")
-        #
-        # for item in data:
-        #     if ':' in item:
-        #         key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-        #         result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        dic = self.create_dictionary(msg)
+
 
         if check_msg(msg, self.recv_ip):
             msg_valid_check = True
@@ -256,8 +251,8 @@ class TTT(tk.Tk):
             self.quit()
             return
         else:  # If message is valid - send ack, update board and change turn
-            row = int(result['New-Move'][1])
-            col = int(result['New-Move'][3])
+            row = int(dic['New-Move'][1])
+            col = int(dic['New-Move'][3])
             loc = row * 3 + col
             #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
             ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
@@ -293,9 +288,9 @@ class TTT(tk.Tk):
         # print("디버그 ",self.user)
         # print('d_msg:',d_msg)
         # print("보드?", self.board)
-        result = self.create_dictionary(d_msg)
-        row = int(result['New-Move'][1])
-        col = int(result['New-Move'][3])
+        dic = self.create_dictionary(d_msg)
+        row = int(dic['New-Move'][1])
+        col = int(dic['New-Move'][3])
         loc = row * 3 + col
 
         if self.board[loc] != 0 :
