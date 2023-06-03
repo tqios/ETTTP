@@ -41,9 +41,8 @@ if __name__ == '__main__':
             client_socket.send(send_msg.encode()) #msg보내고
             ack = client_socket.recv(SIZE).decode() #ack받고
             if not (check_msg(ack, MY_IP) and ack.endswith("YOU\r\n\r\n")): #ack가 ETTTP이고 ack_msg가 YOU인지 확인
-                quit();
+                quit()
 
-        #TODO : 메시지 보낼 때 server, client 를 ME, YOU 로 바꾸기
         else:
             send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: YOU\r\n\r\n"
             client_socket.send(send_msg.encode())
