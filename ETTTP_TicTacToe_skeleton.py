@@ -153,6 +153,9 @@ class TTT(tk.Tk):
         self.create_result_frame()
         self.create_debug_frame()
         self.state = self.active
+
+
+
         if start_user == self.myID:
             self.my_turn = 1
             self.user['text'] = 'X'
@@ -166,6 +169,9 @@ class TTT(tk.Tk):
             self.l_status_bullet.config(fg='red')
             self.l_status['text'] = ['Hold']
             _thread.start_new_thread(self.get_move,())
+
+
+
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     def quit(self):
@@ -175,6 +181,7 @@ class TTT(tk.Tk):
         #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
         self.destroy()
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
     def my_move(self, e, user_move):
         '''
@@ -206,6 +213,18 @@ class TTT(tk.Tk):
             _thread.start_new_thread(self.get_move,())
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    def create_dictionary(self, msg):
+        data = msg.split("\r\n")
+        result = {}
+        if not msg :
+            self.quit()
+
+        for item in data:
+            if ':' in item:
+                key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
+                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        return result
+
     def get_move(self):
         '''
         Function to get move from other peer
@@ -219,13 +238,13 @@ class TTT(tk.Tk):
         # print(msg)
 
         msg = self.socket.recv(SIZE).decode()
-
-        data = msg.split("\r\n")
-        result = {}
-        for item in data:
-            if ':' in item:
-                key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        result = self.create_dictionary(msg)
+        # data = msg.split("\r\n")
+        #
+        # for item in data:
+        #     if ':' in item:
+        #         key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
+        #         result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
 
         if check_msg(msg, self.recv_ip):
             msg_valid_check = True
@@ -272,16 +291,44 @@ class TTT(tk.Tk):
         '''
         Check if the selected location is already taken or not
         '''
-        print("디버그 ",self.user['value'])
+        # print("디버그 ",self.user)
+        # print('d_msg:',d_msg)
+        # print("보드?", self.board)
+        result = self.create_dictionary(d_msg)
+        row = int(result['New-Move'][1])
+        col = int(result['New-Move'][3])
+        loc = row * 3 + col
+
+        if self.board[loc] != 0 :
+            print("이미 선택된 곳")
+            # client_socket.send()
+            self.quit()
+            return
+
+        # if (self.board[loc] != 0):
+        #     self.quit()
 
 
         '''
         Send message to peer
         '''
 
+        self.socket.send(d_msg.encode())
+        self.get_move
+
         '''
         Get ack
         '''
+        ack = self.socket.recv(SIZE).decode()
+        if not(check_msg(ack, self.recv_ip)) :
+            self.quit()
+
+
+
+
+
+
+
 
         # loc = 5 # peer's move, from 0 to 8
 
@@ -314,8 +361,10 @@ class TTT(tk.Tk):
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
-        check_msg(ack,self.recv_ip);
-        return True
+        if check_msg(ack,self.recv_ip):
+            return True
+        else :
+            self.quit()
         ######################################################
 
     #todo : check_result 함수 만들기 (ack 보낼 필요 X)
@@ -347,12 +396,12 @@ class TTT(tk.Tk):
         self.setText[move].set(player['text'])
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
+        print("보드**", self.board)
 
     def update_status(self, player,get=False):
         '''
         This function checks status - define if the game is over or not
         '''
-
         winner_sum = self.line_size * player['value']
         for line in self.all_lines:
             if sum(self.board[i] for i in line) == winner_sum:
