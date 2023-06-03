@@ -4,8 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+  Jun 03, 2023
  
  '''
 
@@ -31,18 +30,25 @@ if __name__ == '__main__':
         client_socket.connect(SERVER_ADDR)  
         
         ###################################################################
-        # Receive who will start first from the server
-        if client_socket.recv(SIZE).decode() == "It's the server's turn":
-            start = 0
-            client_socket.send(bytes("ACK : It's the server's turn", "utf-8"))
-        elif client_socket.recv(SIZE).decode() == "It's the client's turn":
-            start = 1
-            client_socket.send(bytes("ACK : It's the client's turn", "utf-8"))
-        else:
-            print("INVALID RECV")
+        ######################### Fill Out ################################
+        # Send ACK
+        # data = client_socket.send()
+
+        recv = client_socket.recv(SIZE).decode()
+
+        if check_msg(recv, MY_IP):
+            recv_msg = recv.split("\r\n")[2]
+            if recv_msg.endswith("ME"):
+                start = 0
+                ack = "ACK ETTTP/1.0\r\nHost:" + str(SERVER_IP) + "\r\nFirst-Move: YOU\r\n\r\n"
+                client_socket.send(ack.encode())
+            else:
+                start = 1
+                ack = "ACK ETTTP/1.0\r\nHost:" + str(SERVER_IP) + "\r\nFirst-Move: ME\r\n\r\n"
+                client_socket.send(ack.encode())
 
         ###################################################################
-        
+
         # Start game
         root = TTT(target_socket=client_socket, src_addr=MY_IP,dst_addr=SERVER_IP)
         root.play(start_user=start)
