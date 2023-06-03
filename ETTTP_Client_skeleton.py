@@ -4,8 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+  Jun 02, 2023
  
  '''
 
@@ -31,22 +30,20 @@ if __name__ == '__main__':
         client_socket.connect(SERVER_ADDR)  
         
         ###################################################################
+        ######################### Fill Out ################################
+        # Send ACK
+        # data = client_socket.send()
 
+        # TODO : 메시지 받을 때 ME, YOU 로 받아 ACK 보내기
         recv = client_socket.recv(SIZE).decode()
 
-        if check_msg(recv):
+        if check_msg(recv, MY_IP):
             client_socket.send(recv.encode())
             recv_msg = recv.split("\r\n")[2]
             if recv_msg.endswith("server"):
                 start = 0
             else:
                 start = 1
-
-
-        ######################### Fill Out ################################
-        # Send ACK
-        # data = client_socket.send()
-
 
         ###################################################################
 

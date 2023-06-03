@@ -3,9 +3,8 @@
  
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
- 
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+
+  Jun 02, 2023
  
  '''
 
@@ -221,7 +220,6 @@ class TTT(tk.Tk):
 
         msg = self.socket.recv(SIZE).decode()
 
-        ###################################여기 새로짯음 6월 1일ㅇㅇㅇㅇ
         data = msg.split("\r\n")
         result = {}
         for item in data:
@@ -229,9 +227,7 @@ class TTT(tk.Tk):
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
                 result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
 
-
-        # todo 만약 msg가 valid하면 ture, 아니면 false -> 했음
-        if check_msg(msg):
+        if check_msg(msg, self.recv_ip):
             msg_valid_check = True
         else:
             msg_valid_check = False
@@ -241,16 +237,12 @@ class TTT(tk.Tk):
             self.quit()
             return
         else:  # If message is valid - send ack, update board and change turn
-            # todo ack보내기
-            # loc = 5 # received next-move
             row = int(result['New-Move'][1])
             col = int(result['New-Move'][3])
             loc = row * 3 + col
-            ack = "ACK ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: ME\r\n\r\n"
-            self.socket.send(ack.encode());
-
-
-            ######################################################
+            #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
+            ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
+            self.socket.send(ack_msg.encode());
 
 
             #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
@@ -261,7 +253,7 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
+    #todo : send_debug 함수 만들기
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -316,21 +308,17 @@ class TTT(tk.Tk):
         ###################  Fill Out  #######################
 
         # todo send message and check ACK
-        print(selection)
-        print(divmod(selection,3))
-        #row, col 값 메시지에 넣어서 보내기
-        send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
-        print(send_msg)
+        #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
+        send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
         #msg = str(selection).encode()
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
-        check_msg(ack);
-        print('ack를 받았다', ack)
+        check_msg(ack,self.recv_ip);
         return True
         ######################################################
 
-
+    #todo : check_result 함수 만들기 (ack 보낼 필요 X)
     def check_result(self,winner,get=False):
         '''
         Function to check if the result between peers are same
@@ -389,25 +377,25 @@ class TTT(tk.Tk):
 # End of Root class
 
 # def check_msg(msg, recv_ip):
-def check_msg(msg):
+def check_msg(msg, recv_ip):
     '''
     Function that checks if received message is ETTTP format
     '''
     ###################  Fill Out  #######################
     # msg_first = msg.startswith("ETTTP/1.0\r\nHost:127.0.0.1\r\n")
 
-    # 문자열에서 첫 번째 줄을 가져옵니다.
+    # 문자열에서 첫 번 째 줄을 가져옵니다.
     first_line = msg.split('\r\n')[0]
-    print("first+line",first_line)
-    print("msg",msg)
-    # 첫 번째 줄에서 프로토콜 부분을 추출합니다.
-    print(first_line.split(' ')[1])
+    # 첫 번 째 줄에서 프로토콜 부분을 추출합니다.
     protocol = first_line.split(' ')[1]
 
-    # 프로토콜이 ETTTP인지 확인합니다.
-    is_tcp = protocol == "ETTTP/1.0"
-    print(is_tcp)
-    if is_tcp :
+    # 문자열에서 두 번 째 줄을 가져옵니다.
+    second_line = msg.split('\r\n')[1]
+    # 두 번 째 줄에서 host 부분을 추출합니다.
+    host = second_line.split(':')[1]
+
+    # 프로토콜이 ETTTP/1.0인지, Host가 recv_ip인지 확인합니다.
+    if (protocol == "ETTTP/1.0" and host == recv_ip) :
         return True
     else :
         return False
