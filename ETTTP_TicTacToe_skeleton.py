@@ -216,6 +216,9 @@ class TTT(tk.Tk):
     def create_dictionary(self, msg):
         data = msg.split("\r\n")
         result = {}
+        if not msg :
+            self.quit()
+
         for item in data:
             if ':' in item:
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
@@ -300,8 +303,6 @@ class TTT(tk.Tk):
             print("이미 선택된 곳")
             # client_socket.send()
             self.quit()
-
-            # self.
             return
 
         # if (self.board[loc] != 0):
@@ -311,11 +312,22 @@ class TTT(tk.Tk):
         '''
         Send message to peer
         '''
+
         self.socket.send(d_msg.encode())
+        self.get_move
 
         '''
         Get ack
         '''
+        ack = self.socket.recv(SIZE).decode()
+        if not(check_msg(ack, self.recv_ip)) :
+            self.quit()
+
+
+
+
+
+
 
 
         # loc = 5 # peer's move, from 0 to 8
@@ -349,8 +361,10 @@ class TTT(tk.Tk):
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
-        check_msg(ack,self.recv_ip);
-        return True
+        if check_msg(ack,self.recv_ip):
+            return True
+        else :
+            self.quit()
         ######################################################
 
     #todo : check_result 함수 만들기 (ack 보낼 필요 X)
