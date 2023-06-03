@@ -4,8 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Skeleton Code Prepared by JeiHee Cho
-  May 24, 2023
+  Jun 03, 2023
  
  '''
 
@@ -33,27 +32,23 @@ if __name__ == '__main__':
         ###################################################################
         # Send start move information to peer
         # client_socket.send(start)
-
+        ######################### Fill Out ################################
+        # Receive ack - if ack is correct, start game
 
         start = random.randrange(0,2)
         if start == 0:
-            send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: server\r\n\r\n"
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: ME\r\n\r\n"
             client_socket.send(send_msg.encode()) #msg보내고
-            msg = client_socket.recv(SIZE).decode() #ack받고
-            if check_msg(msg): #ack가 ETTTP인지 확인
-                ack_msg = msg.split("\r\n")[2]
-
+            ack = client_socket.recv(SIZE).decode() #ack받고
+            if not (check_msg(ack, MY_IP) and ack.endswith("YOU\r\n\r\n")): #ack가 ETTTP이고 ack_msg가 YOU인지 확인
+                quit()
 
         else:
-            send_msg = "SEND ETTTP/1.0\r\nHost:127.0.0.1\r\nFirst-Move: client\r\n\r\n"
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: YOU\r\n\r\n"
             client_socket.send(send_msg.encode())
-            msg = client_socket.recv(SIZE).decode()
-            if check_msg(msg):
-                ack_msg = msg.split("\r\n")[2]
-                # print("ack_msg : ", ack_msg)
-
-        ######################### Fill Out ################################
-        # Receive ack - if ack is correct, start game
+            ack = client_socket.recv(SIZE).decode()
+            if not (check_msg(ack, MY_IP) and ack.endswith("ME\r\n\r\n")): #ack가 ETTTP이고 ack_msg가 ME인지 확인
+                quit();
 
         ###################################################################
 

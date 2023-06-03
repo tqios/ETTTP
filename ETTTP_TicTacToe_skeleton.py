@@ -4,7 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
 
-  Jun 02, 2023
+  Jun 03, 2023
  
  '''
 
@@ -215,15 +215,15 @@ class TTT(tk.Tk):
 
     def create_dictionary(self, msg):
         data = msg.split("\r\n")
-        result = {}
+        dic = {}
         if not msg :
             self.quit()
 
         for item in data:
             if ':' in item:
                 key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-                result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
-        return result
+                dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        return dic
 
     def get_move(self):
         '''
@@ -238,26 +238,18 @@ class TTT(tk.Tk):
         # print(msg)
 
         msg = self.socket.recv(SIZE).decode()
-        result = self.create_dictionary(msg)
-        # data = msg.split("\r\n")
-        #
-        # for item in data:
-        #     if ':' in item:
-        #         key, value = item.split(':', 1)  # ':'을 기준으로 키와 값으로 분리
-        #         result[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
+        dic = self.create_dictionary(msg)
 
-        if check_msg(msg, self.recv_ip):
-            msg_valid_check = True
-        else:
-            msg_valid_check = False
+
+        msg_valid_check = check_msg(msg, self.recv_ip)
 
         if not msg_valid_check: # Message is not valid
             self.socket.close()
             self.quit()
             return
         else:  # If message is valid - send ack, update board and change turn
-            row = int(result['New-Move'][1])
-            col = int(result['New-Move'][3])
+            row = int(dic['New-Move'][1])
+            col = int(dic['New-Move'][3])
             loc = row * 3 + col
             #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
             ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
@@ -272,7 +264,6 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    #todo : send_debug 함수 만들기
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -291,46 +282,28 @@ class TTT(tk.Tk):
         '''
         Check if the selected location is already taken or not
         '''
-        # print("디버그 ",self.user)
-        # print('d_msg:',d_msg)
-        # print("보드?", self.board)
-        result = self.create_dictionary(d_msg)
-        row = int(result['New-Move'][1])
-        col = int(result['New-Move'][3])
-        loc = row * 3 + col
+        if check_msg(d_msg, self.recv_ip):
+            dic = self.create_dictionary(d_msg)
+            row = int(dic['New-Move'][1])
+            col = int(dic['New-Move'][3])
+            loc = row * 3 + col
 
-        if self.board[loc] != 0 :
-            print("이미 선택된 곳")
-            # client_socket.send()
-            self.quit()
+            if self.board[loc] != 0 :
+                print("이미 선택된 곳")
+                # client_socket.send()
+                self.quit()
+                return
+
+            #Send message to peer
+            self.socket.send(d_msg.encode())
+            self.get_move
+
+            #Get ack
+            ack = self.socket.recv(SIZE).decode()
+            if not(check_msg(ack, self.recv_ip)) :
+                self.quit()
+        else:
             return
-
-        # if (self.board[loc] != 0):
-        #     self.quit()
-
-
-        '''
-        Send message to peer
-        '''
-
-        self.socket.send(d_msg.encode())
-        self.get_move
-
-        '''
-        Get ack
-        '''
-        ack = self.socket.recv(SIZE).decode()
-        if not(check_msg(ack, self.recv_ip)) :
-            self.quit()
-
-
-
-
-
-
-
-
-        # loc = 5 # peer's move, from 0 to 8
 
         ######################################################
 
@@ -354,7 +327,6 @@ class TTT(tk.Tk):
         row,col = divmod(selection,3)
         ###################  Fill Out  #######################
 
-        # todo send message and check ACK
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
         #msg = str(selection).encode()
@@ -367,7 +339,7 @@ class TTT(tk.Tk):
             self.quit()
         ######################################################
 
-    #todo : check_result 함수 만들기 (ack 보낼 필요 X)
+
     def check_result(self,winner,get=False):
         '''
         Function to check if the result between peers are same
@@ -375,11 +347,23 @@ class TTT(tk.Tk):
         '''
         # no skeleton
         ###################  Fill Out  #######################
+        if winner == 'ME' and not get :
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nWinner: ME\r\n\r\n"
+            self.socket.send(send_msg.encode())
+            print('winner send')
 
+        elif winner == 'YOU' and get:
+            msg = self.socket.recv(SIZE).decode()
+            if not (check_msg(msg, self.recv_ip) and msg.endswith("ME\r\n\r\n")):
+                self.quit()
+            else :
+                print("get check")
+            return True
 
+        else:
+            print("error")
+            self.quit()
 
-
-        return True
         ######################################################
 
 
@@ -396,7 +380,6 @@ class TTT(tk.Tk):
         self.setText[move].set(player['text'])
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
-        print("보드**", self.board)
 
     def update_status(self, player,get=False):
         '''

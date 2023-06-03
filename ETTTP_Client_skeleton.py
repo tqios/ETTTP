@@ -34,7 +34,6 @@ if __name__ == '__main__':
         # Send ACK
         # data = client_socket.send()
 
-        # TODO : 메시지 받을 때 ME, YOU 로 받아 ACK 보내기
         recv = client_socket.recv(SIZE).decode()
 
         if check_msg(recv, MY_IP):
