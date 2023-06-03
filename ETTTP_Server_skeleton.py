@@ -4,7 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Jun 02, 2023
+  Jun 03, 2023
  
  '''
 
@@ -37,19 +37,21 @@ if __name__ == '__main__':
 
         start = random.randrange(0,2)
         if start == 0:
-            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: server\r\n\r\n"
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: ME\r\n\r\n"
             client_socket.send(send_msg.encode()) #msg보내고
-            msg = client_socket.recv(SIZE).decode() #ack받고
-            if check_msg(msg, MY_IP): #ack가 ETTTP인지 확인
-                ack_msg = msg.split("\r\n")[2]
+            ack = client_socket.recv(SIZE).decode() #ack받고
+            ack_msg = ack.split("\r\n")[2]
+            if not check_msg(ack, MY_IP) and ack_msg == "YOU": #ack가 ETTTP이고 ack_msg가 YOU인지 확인
+                quit();
 
         #TODO : 메시지 보낼 때 server, client 를 ME, YOU 로 바꾸기
         else:
-            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: client\r\n\r\n"
+            send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: YOU\r\n\r\n"
             client_socket.send(send_msg.encode())
-            msg = client_socket.recv(SIZE).decode()
-            if check_msg(msg, MY_IP):
-                ack_msg = msg.split("\r\n")[2]
+            ack = client_socket.recv(SIZE).decode()
+            ack_msg = ack.split("\r\n")[2]
+            if not check_msg(ack, MY_IP) and ack_msg == "ME": #ack가 ETTTP이고 ack_msg가 ME인지 확인
+                quit();
 
         ###################################################################
 
