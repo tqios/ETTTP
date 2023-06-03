@@ -272,7 +272,6 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    #todo : send_debug 함수 만들기
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -305,10 +304,6 @@ class TTT(tk.Tk):
             self.quit()
             return
 
-        # if (self.board[loc] != 0):
-        #     self.quit()
-
-
         '''
         Send message to peer
         '''
@@ -323,14 +318,6 @@ class TTT(tk.Tk):
         if not(check_msg(ack, self.recv_ip)) :
             self.quit()
 
-
-
-
-
-
-
-
-        # loc = 5 # peer's move, from 0 to 8
 
         ######################################################
 
@@ -354,7 +341,6 @@ class TTT(tk.Tk):
         row,col = divmod(selection,3)
         ###################  Fill Out  #######################
 
-        # todo send message and check ACK
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
         #msg = str(selection).encode()
