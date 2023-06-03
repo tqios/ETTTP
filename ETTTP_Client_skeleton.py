@@ -4,7 +4,7 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
  
-  Jun 02, 2023
+  Jun 03, 2023
  
  '''
 
@@ -34,16 +34,18 @@ if __name__ == '__main__':
         # Send ACK
         # data = client_socket.send()
 
-        # TODO : 메시지 받을 때 ME, YOU 로 받아 ACK 보내기
         recv = client_socket.recv(SIZE).decode()
 
         if check_msg(recv, MY_IP):
-            client_socket.send(recv.encode())
             recv_msg = recv.split("\r\n")[2]
-            if recv_msg.endswith("server"):
+            if recv_msg.endswith("ME"):
                 start = 0
+                ack = "ACK ETTTP/1.0\r\nHost:" + str(SERVER_IP) + "\r\nFirst-Move: YOU\r\n\r\n"
+                client_socket.send(ack.encode())
             else:
                 start = 1
+                ack = "ACK ETTTP/1.0\r\nHost:" + str(SERVER_IP) + "\r\nFirst-Move: ME\r\n\r\n"
+                client_socket.send(ack.encode())
 
         ###################################################################
 
