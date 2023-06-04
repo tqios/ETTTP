@@ -4,7 +4,10 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
 
-  Jun 03, 2023
+  2171085 김지윤
+  2171087 이희원
+
+  Jun 04, 2023
  
  '''
 
@@ -236,7 +239,7 @@ class TTT(tk.Tk):
                 dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
         return dic
 
-    # 받은 메시지의 유효성을 체크하고 유효한 경우, 메시지에서 좌표를 가져와 보드 업데이트 + ack보냄
+    # 받은 메시지의 유효성을 체크하고 유효한 경우, 메시지에서 좌표를 가져와 ack보낸 후 보드 업데이트
     # 유효하지 않은 경우 프로그램 종료
     def get_move(self):
         '''
@@ -260,7 +263,6 @@ class TTT(tk.Tk):
             row = int(dic['New-Move'][1])
             col = int(dic['New-Move'][3])
             loc = row * 3 + col
-            #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
             ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
             self.socket.send(ack_msg.encode());
 
@@ -272,6 +274,7 @@ class TTT(tk.Tk):
                 self.l_status_bullet.config(fg='green')
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
     # textbox에 입력된 메시지를 분석해 ETTTP인지 확인 -> 이미 체크 된 자리이면 프로그램 종료
     # 신규 자리인 경우, 소켓에 메시지 전송 + ack받아 유효한 지 확인 후 보드 업데이트
@@ -300,7 +303,6 @@ class TTT(tk.Tk):
             loc = row * 3 + col
 
             if self.board[loc] != 0 :
-                print("이미 선택된 곳")
                 self.quit()
 
             #Send message to peer
@@ -310,7 +312,7 @@ class TTT(tk.Tk):
             ack = self.socket.recv(SIZE).decode()
             if not(check_msg(ack, self.recv_ip)) :
                 self.quit()
-        else:
+        else: # 받은 메시지가 올바른 형식이 아니면
             return
 
         ######################################################
@@ -334,7 +336,7 @@ class TTT(tk.Tk):
         Function to send message to peer using button click
         selection indicates the selected button
         '''
-        row,col = divmod(selection,3)
+        row, col = divmod(selection, 3)
         ###################  Fill Out  #######################
 
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
@@ -342,7 +344,7 @@ class TTT(tk.Tk):
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
-        if check_msg(ack,self.recv_ip):
+        if check_msg(ack, self.recv_ip):
             return True
         else :
             return False
@@ -351,6 +353,7 @@ class TTT(tk.Tk):
 
     # 승자를 이중 체크하는 함수.
     # winner가 클릭한 사용자이고(ME), get이 false이면 메시지 전송
+    # winner가 YOU, get이 false이면 메시지를 받고 확인
     def check_result(self,winner,get=False):
         '''
         Function to check if the result between peers are same
@@ -361,20 +364,16 @@ class TTT(tk.Tk):
         if winner == 'ME' and not get :
             send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nWinner: ME\r\n\r\n"
             self.socket.send(send_msg.encode())
-            print('winner send')
-            return True
 
         elif winner == 'YOU' and get:
             msg = self.socket.recv(SIZE).decode()
             if not (check_msg(msg, self.recv_ip) and msg.endswith("ME\r\n\r\n")):
                 self.quit()
-            else :
-                print("get check")
-            return True
 
         else:
-            print("error")
             self.quit()
+
+        return True
 
         ######################################################
 
@@ -395,7 +394,7 @@ class TTT(tk.Tk):
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
 
-    # 게임이 끝났는지 확인하는 함수 ( check_result함수로 이중확인 )
+    # 게임이 끝났는지(승리자가 있는지) 확인하는 함수 ( check_result함수로 이중확인 )
     def update_status(self, player,get=False):
         '''
         This function checks status - define if the game is over or not

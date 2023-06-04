@@ -3,8 +3,11 @@
  
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
- 
-  Jun 03, 2023
+
+  2171085 김지윤
+  2171087 이희원
+
+  Jun 04, 2023
  
  '''
 
