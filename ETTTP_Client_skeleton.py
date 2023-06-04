@@ -3,8 +3,11 @@
  
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
- 
-  Jun 03, 2023
+
+  2171085 김지윤
+  2171087 이희원
+
+  Jun 04, 2023
  
  '''
 
@@ -32,10 +35,10 @@ if __name__ == '__main__':
         ###################################################################
         ######################### Fill Out ################################
         # Send ACK
-        # data = client_socket.send()
 
         recv = client_socket.recv(SIZE).decode()
 
+        # 받은 메시지가 유효하면, start에 차례를 정하고 ack를 보냄
         if check_msg(recv, MY_IP):
             recv_msg = recv.split("\r\n")[2]
             if recv_msg.endswith("ME"):

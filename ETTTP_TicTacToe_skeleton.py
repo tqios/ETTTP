@@ -4,7 +4,10 @@
   34743-02 Information Communications
   Term Project on Implementation of Ewah Tic-Tac-Toe Protocol
 
-  Jun 03, 2023
+  2171085 김지윤
+  2171087 이희원
+
+  Jun 04, 2023
  
  '''
 
@@ -16,6 +19,7 @@ import _thread
 SIZE=1024
 
 class TTT(tk.Tk):
+    # 생성자
     def __init__(self, target_socket,src_addr,dst_addr, client=True):
         super().__init__()
         
@@ -59,6 +63,7 @@ class TTT(tk.Tk):
 
         self.create_control_frame()
 
+    # create TicTacToe frame
     def create_control_frame(self):
         '''
         Make Quit button to quit game 
@@ -73,6 +78,8 @@ class TTT(tk.Tk):
                                 command=self.quit)
         self.b_quit.pack(side=tk.RIGHT)
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    # create TicTacToe frame
     def create_status_frame(self):
         '''
         Status UI that shows "Hold" or "Ready"
@@ -87,6 +94,7 @@ class TTT(tk.Tk):
         self.l_status.pack(side=tk.RIGHT,anchor='w')
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         
+    # create TicTacToe frame : 결과관련
     def create_result_frame(self):
         '''
         UI that shows Result
@@ -99,6 +107,7 @@ class TTT(tk.Tk):
         self.l_result.pack(side=tk.BOTTOM,anchor='w')
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         
+    # create TicTacToe frame
     def create_debug_frame(self):
         '''
         Debug UI that gets input from the user
@@ -114,6 +123,7 @@ class TTT(tk.Tk):
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         
     
+    # create TicTacToe frame
     def create_board_frame(self):
         '''
         Tic-Tac-Toe Board UI
@@ -140,6 +150,7 @@ class TTT(tk.Tk):
             
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    # 게임 시작 함수
     def play(self, start_user):
         '''
         Call this function to initiate the game
@@ -174,6 +185,7 @@ class TTT(tk.Tk):
 
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    # 게임 종료 함수
     def quit(self):
         '''
         Call this function to close GUI
@@ -183,6 +195,7 @@ class TTT(tk.Tk):
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+    # 차례인 사용자가 버튼 클릭 시, 유효하면 board update + 차례바꾸기
     def my_move(self, e, user_move):
         '''
         Read button when the player clicks the button
@@ -213,6 +226,7 @@ class TTT(tk.Tk):
             _thread.start_new_thread(self.get_move,())
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    # 문자열을 딕셔너리로 만듦
     def create_dictionary(self, msg):
         data = msg.split("\r\n")
         dic = {}
@@ -225,6 +239,8 @@ class TTT(tk.Tk):
                 dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
         return dic
 
+    # 받은 메시지의 유효성을 체크하고 유효한 경우, 메시지에서 좌표를 가져와 ack보낸 후 보드 업데이트
+    # 유효하지 않은 경우 프로그램 종료
     def get_move(self):
         '''
         Function to get move from other peer
@@ -233,10 +249,6 @@ class TTT(tk.Tk):
         If is not, close socket and quit
         '''
         ###################  Fill Out  #######################
-        # msg =  "message" # get message using socket
-        # msg = self.socket.recv(SIZE).decode()
-        # print(msg)
-
         msg = self.socket.recv(SIZE).decode()
         dic = self.create_dictionary(msg)
 
@@ -246,12 +258,11 @@ class TTT(tk.Tk):
         if not msg_valid_check: # Message is not valid
             self.socket.close()
             self.quit()
-            return
+
         else:  # If message is valid - send ack, update board and change turn
             row = int(dic['New-Move'][1])
             col = int(dic['New-Move'][3])
             loc = row * 3 + col
-            #ack_msg 수정 / host, 받은 new-move 값 추가해서 전송
             ack_msg = "ACK ETTTP/1.0\r\nHost:" + str(self.send_ip) + "\r\nNew-Move:(" + str(row) + "," + str(col) + ")\r\n\r\n"
             self.socket.send(ack_msg.encode());
 
@@ -264,6 +275,9 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+    # textbox에 입력된 메시지를 분석해 ETTTP인지 확인 -> 이미 체크 된 자리이면 프로그램 종료
+    # 신규 자리인 경우, 소켓에 메시지 전송 + ack받아 유효한 지 확인 후 보드 업데이트
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -289,20 +303,16 @@ class TTT(tk.Tk):
             loc = row * 3 + col
 
             if self.board[loc] != 0 :
-                print("이미 선택된 곳")
-                # client_socket.send()
                 self.quit()
-                return
 
             #Send message to peer
             self.socket.send(d_msg.encode())
-            self.get_move
 
             #Get ack
             ack = self.socket.recv(SIZE).decode()
             if not(check_msg(ack, self.recv_ip)) :
                 self.quit()
-        else:
+        else: # 받은 메시지가 올바른 형식이 아니면
             return
 
         ######################################################
@@ -319,27 +329,31 @@ class TTT(tk.Tk):
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
+    # 상대방에게 클릭한 좌표를 메시지에 담아 보내는 함수 + ack 확인
+    # ack형식 확인
     def send_move(self,selection):
         '''
         Function to send message to peer using button click
         selection indicates the selected button
         '''
-        row,col = divmod(selection,3)
+        row, col = divmod(selection, 3)
         ###################  Fill Out  #######################
 
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
-        #msg = str(selection).encode()
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
-        if check_msg(ack,self.recv_ip):
+        if check_msg(ack, self.recv_ip):
             return True
         else :
-            self.quit()
+            return False
         ######################################################
 
 
+    # 승자를 이중 체크하는 함수.
+    # winner가 클릭한 사용자이고(ME), get이 false이면 메시지 전송
+    # winner가 YOU, get이 false이면 메시지를 받고 확인
     def check_result(self,winner,get=False):
         '''
         Function to check if the result between peers are same
@@ -350,24 +364,23 @@ class TTT(tk.Tk):
         if winner == 'ME' and not get :
             send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nWinner: ME\r\n\r\n"
             self.socket.send(send_msg.encode())
-            print('winner send')
 
         elif winner == 'YOU' and get:
             msg = self.socket.recv(SIZE).decode()
             if not (check_msg(msg, self.recv_ip) and msg.endswith("ME\r\n\r\n")):
                 self.quit()
-            else :
-                print("get check")
-            return True
 
         else:
-            print("error")
             self.quit()
+
+        return True
 
         ######################################################
 
 
     #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
+
+    # 보드 업데이트
     def update_board(self, player, move, get=False):
         '''
         This function updates Board if is clicked
@@ -381,6 +394,7 @@ class TTT(tk.Tk):
         self.cell[move]['bg'] = player['bg']
         self.update_status(player,get=get)
 
+    # 게임이 끝났는지(승리자가 있는지) 확인하는 함수 ( check_result함수로 이중확인 )
     def update_status(self, player,get=False):
         '''
         This function checks status - define if the game is over or not
@@ -398,6 +412,7 @@ class TTT(tk.Tk):
                 else:
                     self.l_result['text'] = "Somethings wrong..."
 
+    # 이긴 line에 하이라이트하는 함수
     def highlight_winning_line(self, player, line):
         '''
         This function highlights the winning line
@@ -409,14 +424,12 @@ class TTT(tk.Tk):
 
 # End of Root class
 
-# def check_msg(msg, recv_ip):
+# 메시지가 ETTTP인지 + ip주소가 자신의 ip와 같은지 확인하는 함수
 def check_msg(msg, recv_ip):
     '''
     Function that checks if received message is ETTTP format
     '''
     ###################  Fill Out  #######################
-    # msg_first = msg.startswith("ETTTP/1.0\r\nHost:127.0.0.1\r\n")
-
     # 문자열에서 첫 번 째 줄을 가져옵니다.
     first_line = msg.split('\r\n')[0]
     # 첫 번 째 줄에서 프로토콜 부분을 추출합니다.
