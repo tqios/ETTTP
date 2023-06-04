@@ -31,10 +31,11 @@ if __name__ == '__main__':
 
         ###################################################################
         # Send start move information to peer
-        # client_socket.send(start)
         ######################### Fill Out ################################
         # Receive ack - if ack is correct, start game
 
+        # 시작할 사람을 정해 메시지 전송
+        # ack로 상대방이 메시지를 잘 받았는지 확인 후 게임 진행
         start = random.randrange(0,2)
         if start == 0:
             send_msg = "SEND ETTTP/1.0\r\nHost:"+str(client_addr[0])+"\r\nFirst-Move: ME\r\n\r\n"

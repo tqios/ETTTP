@@ -91,7 +91,7 @@ class TTT(tk.Tk):
         self.l_status.pack(side=tk.RIGHT,anchor='w')
         #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         
-    # create TicTacToe frame
+    # create TicTacToe frame : 결과관련
     def create_result_frame(self):
         '''
         UI that shows Result
@@ -236,7 +236,8 @@ class TTT(tk.Tk):
                 dic[key.strip()] = value.strip()  # 공백을 제거하고 딕셔너리에 추가
         return dic
 
-    # 받은 메시지의 유효성을 체크하고 유효한 경우, 좌표를가져와 보드를 업데이트 + ack보냄
+    # 받은 메시지의 유효성을 체크하고 유효한 경우, 메시지에서 좌표를 가져와 보드 업데이트 + ack보냄
+    # 유효하지 않은 경우 프로그램 종료
     def get_move(self):
         '''
         Function to get move from other peer
@@ -272,8 +273,8 @@ class TTT(tk.Tk):
                 self.l_status ['text'] = ['Ready']
             #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    # textbox에 입력된 메시지를 분석해 ETTTP인지 확인 이미 체크 된 자리이면 프로그램 종료
-    # 아닌 경우, 소켓에 메시지 전송 + ack받아 유효한 지 확인 후 보드 업데이트
+    # textbox에 입력된 메시지를 분석해 ETTTP인지 확인 -> 이미 체크 된 자리이면 프로그램 종료
+    # 신규 자리인 경우, 소켓에 메시지 전송 + ack받아 유효한 지 확인 후 보드 업데이트
     def send_debug(self):
         '''
         Function to send message to peer using input from the textbox
@@ -327,6 +328,7 @@ class TTT(tk.Tk):
 
 
     # 상대방에게 클릭한 좌표를 메시지에 담아 보내는 함수 + ack 확인
+    # ack형식 확인
     def send_move(self,selection):
         '''
         Function to send message to peer using button click
@@ -337,7 +339,6 @@ class TTT(tk.Tk):
 
         #row, col 값 메시지에 넣어서 보내기 + host 에 send_ip 넣어서 보내기
         send_msg = "SEND ETTTP/1.0\r\nHost:"+str(self.send_ip)+"\r\nNew-Move:("+str(row)+","+str(col)+")\r\n\r\n"
-        #msg = str(selection).encode()
         self.socket.send(send_msg.encode())
 
         ack = self.socket.recv(SIZE).decode()
@@ -379,6 +380,7 @@ class TTT(tk.Tk):
 
 
     #vvvvvvvvvvvvvvvvvvv  DO NOT CHANGE  vvvvvvvvvvvvvvvvvvv
+
     # 보드 업데이트
     def update_board(self, player, move, get=False):
         '''
@@ -411,7 +413,7 @@ class TTT(tk.Tk):
                 else:
                     self.l_result['text'] = "Somethings wrong..."
 
-    # 이긴 line에 하이라이드하는 함수
+    # 이긴 line에 하이라이트하는 함수
     def highlight_winning_line(self, player, line):
         '''
         This function highlights the winning line
